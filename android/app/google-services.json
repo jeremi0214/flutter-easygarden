@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "182294228382",
+    "project_id": "easygarden-3c6d4",
+    "storage_bucket": "easygarden-3c6d4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:182294228382:android:df70948c7226e62c693a8f",
+        "android_client_info": {
+          "package_name": "com.example.easygarden"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "182294228382-q0t2dh41uv8rqt7kn3ghpa84mjfnhngn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.easygarden",
+            "certificate_hash": "57e2d9fba96a6b4ecf95efde741cb112c677b17d"
+          }
+        },
+        {
+          "client_id": "182294228382-uqap9a3479gi7v8981klrpvdgchu5et4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASHuqhaDGLQ7xtYUkiwZ6EIePEFwhoTYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "182294228382-uqap9a3479gi7v8981klrpvdgchu5et4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "182294228382-obpnhjihel0lg3tnh17legikh4q9b844.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.easygarden"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
