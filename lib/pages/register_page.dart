@@ -17,63 +17,49 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
 
+  // loading state
+  bool isLoading = false;
+
   // text controllers
   final TextEditingController usernameController = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
-
   final TextEditingController confirmPwController = TextEditingController();
 
   // login method
   void registerUser() async {
-    // show loading circle
-    showDialog(
-      context: context,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-
     // validate inputs
-    if (!_formKey.currentState!.validate()) {
-      Navigator.pop(context); 
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
-    // make sure passwords match
+    // check if passwords match
     if (passwordController.text != confirmPwController.text) {
-      // pop the loading circle
-      Navigator.pop(context);
-
       // show error message to user
       displayMessageToUser("Passwords don't match!", context);
     }
     
-    // if passwords do match
-    else {
-      // try creating the user
-      try {
-        // create the user
-        UserCredential? userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-              email: emailController.text,
-              password: passwordController.text,
-            );
+    // start loading
+    setState(() => isLoading = true);
 
-        // create a user document and add to firestore
-        await createUserDocument(userCredential);
+    try {
+      // create the user
+      UserCredential? userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text,
+            password: passwordController.text,
+          );
 
-        // pop loading circle
-        if (context.mounted) Navigator.pop(context);
-      } on FirebaseAuthException catch (e) {
-        // pop loading circle
-        Navigator.pop(context);
+      // create a user document and add to firestore
+      await createUserDocument(userCredential);
 
-        // display error message to user
-        displayMessageToUser(e.message ?? "Registration failed", context);
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/home_page');
       }
+    } on FirebaseAuthException catch (e) {
+      // display error message to user
+      displayMessageToUser(e.message ?? "Registration failed", context);
+    } finally {
+      // stop loading
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
