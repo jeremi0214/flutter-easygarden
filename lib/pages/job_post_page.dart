@@ -112,8 +112,13 @@ class _JobPostPageState extends State<JobPostPage> {
                 obscureText: false,
                 controller: budgetController,
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                      value == null || value.isEmpty ? "Budget is required" : null,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Budget is required";
+                  }
+                  // Optional: You can add more specific validation for the format of the budget.
+                  return null;
+                },
               ),
 
               const SizedBox(height: 10),
@@ -124,9 +129,17 @@ class _JobPostPageState extends State<JobPostPage> {
                 obscureText: false,
                 controller: contactController,
                 keyboardType: TextInputType.phone,
-                validator: (value) => value == null || value.length < 7
-                      ? "Enter a valid phone number"
-                      : null,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Contact number is required";
+                  }
+                  // Validate phone number length
+                  if (value.length < 7 || value.length > 15) {
+                    return "Enter a valid phone number";
+                  }
+                  // Optionally, add more checks for specific phone number formats
+                  return null;
+                },
               ),
 
               const SizedBox(height: 20),
