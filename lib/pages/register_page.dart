@@ -107,8 +107,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   hintText: "Username",
                   obscureText: false,
                   controller: usernameController,
-                  validator: (value) => 
-                      value == null || value.isEmpty ? "Username is required" : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Username is required";
+                    } else if (value.length < 3) {
+                      return "Username must be at least 3 characters";
+                    } else if (!RegExp(r"^[a-zA-Z0-9_]+$").hasMatch(value)) {
+                      return "Username can only contain letters, numbers, and underscores";
+                    }
+                    return null;
+                  }
                 ),
 
                 const SizedBox(height: 10),
@@ -119,10 +127,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   obscureText: false,
                   controller: emailController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) return "Email is required";
-                    if (!value.contains("@")) return "Enter a valid email";
+                    if (value == null || value.isEmpty) {
+                      return "Email is required";
+                    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)) {
+                      return "Enter a valid email address";
+                    }
                     return null;
-                  },
+                  }
                 ),
 
                 const SizedBox(height: 10),
@@ -132,8 +143,20 @@ class _RegisterPageState extends State<RegisterPage> {
                   hintText: "Password",
                   obscureText: true,
                   controller: passwordController,
-                  validator: (value) => 
-                      value == null || value.length < 6 ? "Password must be at least 6 characters" : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Password is required";
+                    } else if (value.length < 8) {
+                      return "Password must be at least 8 characters";
+                    } else if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                      return "Password must contain at least one uppercase letter";
+                    } else if (!RegExp(r'[0-9]').hasMatch(value)) {
+                      return "Password must contain at least one number";
+                    } else if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                      return "Password must contain at least one special character";
+                    }
+                    return null;
+                  }
                 ),
 
                 const SizedBox(height: 10),
@@ -143,8 +166,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   hintText: "Confirm Password",
                   obscureText: true,
                   controller: confirmPwController,
-                  validator: (value) => 
-                      value != passwordController.text ? "Passwords do not match" : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please confirm your password";
+                    } else if (value != passwordController.text) {
+                      return "Passwords do not match";
+                    }
+                    return null;
+                  }
                 ),
 
                 const SizedBox(height: 10),
