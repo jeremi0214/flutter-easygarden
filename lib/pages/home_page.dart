@@ -1,3 +1,4 @@
+import 'package:easygarden/components/ad_banner.dart';
 import 'package:easygarden/components/my_drawer.dart';
 import 'package:easygarden/components/job_list_card.dart';
 import 'package:easygarden/database/firestore.dart';
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // firestore access
+  // Firestore access
   final FirestoreDatabase database = FirestoreDatabase();
   final TextEditingController _searchController = TextEditingController();
 
@@ -23,7 +24,14 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  } 
+  }
+
+  void _performSearch() {
+    FocusScope.of(context).unfocus(); // Hide keyboard
+    setState(() {
+      _searchQuery = _searchController.text.trim().toLowerCase();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,25 +44,12 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
       ),
       drawer: const MyDrawer(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to the JobPostScreen when FAB is tapped
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => JobPostPage()),
-          );
-        },
-        tooltip: "Post a New Job",
-        child: Icon(
-          Icons.add,
-          color: Theme.of(context).colorScheme.inversePrimary,
-        ),
-      ),
+
       body: Column(
         children: [
+          // Search bar
           Row(
             children: [
-              // Search bar
               Expanded(
                 child: TextField(
                   controller: _searchController,
@@ -64,36 +59,26 @@ class _HomePageState extends State<HomePage> {
                     fillColor: Theme.of(context).colorScheme.primary,
                     border: OutlineInputBorder(
                       borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(12)
+                        left: Radius.circular(12),
                       ),
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  onSubmitted: (value) {
-                    setState(() {
-                      _searchQuery = value.trim().toLowerCase();
-                    });
-                  },
+                  onSubmitted: (_) => _performSearch(),
                 ),
               ),
-
-              // search button
               Container(
                 height: 56,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.secondary,
                   borderRadius: const BorderRadius.horizontal(
-                    right: Radius.circular(12)
+                    right: Radius.circular(12),
                   ),
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.search),
                   color: Theme.of(context).colorScheme.inversePrimary,
-                  onPressed: () {
-                    setState(() {
-                      _searchQuery = _searchController.text.trim().toLowerCase();
-                    });
-                  }, 
+                  onPressed: _performSearch,
                 ),
               ),
             ],
@@ -110,16 +95,15 @@ class _HomePageState extends State<HomePage> {
 
                 final jobs = snapshot.data?.docs ?? [];
 
-                // apply search filter
                 final trimmedQuery = _searchQuery.trim();
                 final filteredJobs = trimmedQuery.isEmpty
                     ? jobs
                     : jobs.where((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-                      final title = data['title']?.toString().toLowerCase() ?? '';
-                      final location = data['location']?.toString().toLowerCase() ?? '';
-                      return title.contains(trimmedQuery) || location.contains(trimmedQuery);
-                    }).toList();                  
+                        final data = doc.data() as Map<String, dynamic>;
+                        final title = data['title']?.toString().toLowerCase() ?? '';
+                        final location = data['location']?.toString().toLowerCase() ?? '';
+                        return title.contains(trimmedQuery) || location.contains(trimmedQuery);
+                      }).toList();
 
                 if (filteredJobs.isEmpty) {
                   return const Center(
@@ -133,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Count
+                    // Job count
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       child: Text(
@@ -184,6 +168,28 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
+
+      // Floating action button
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const JobPostPage()),
+          );
+        },
+        tooltip: "Post a New Job",
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).colorScheme.inversePrimary,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+      // Ad banner at the bottom (using bottomNavigationBar)
+      bottomNavigationBar: const ImageAdBanner(
+        imagePath: 'assets/garden_box_logo.png',
+        targetUrl: 'https://www.gardenbox.co.nz/',
       ),
     );
   }
