@@ -1,15 +1,29 @@
 import 'package:easygarden/components/my_drawer.dart';
-import 'package:easygarden/components/my_list_tile.dart';
+import 'package:easygarden/components/job_list_card.dart';
 import 'package:easygarden/database/firestore.dart';
 import 'package:easygarden/pages/job_detail_page.dart';
 import 'package:easygarden/pages/job_post_page.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   // firestore access
   final FirestoreDatabase database = FirestoreDatabase();
+  final TextEditingController _searchController = TextEditingController();
+
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -38,69 +52,136 @@ class HomePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // job list data from firestore
-          StreamBuilder(
-            stream: database.getJobsStream(), 
-            builder: (context, snapshot) {
-              // show loading circle
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              // get all posts
-              final jobs = snapshot.data!.docs;
-
-              // no data?
-              if (snapshot.data == null || jobs.isEmpty) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(25),
-                    child: Text("Sorry, there are NO available jobs...")
+          Row(
+            children: [
+              // Search bar
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by title or location...',
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.primary,
+                    border: OutlineInputBorder(
+                      borderRadius: const BorderRadius.horizontal(
+                        left: Radius.circular(12)
+                      ),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
-                );
-              }
-
-              // return as a list
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: jobs.length,
-                  itemBuilder: (context, index) {
-                    // get each individual post
-                    final job = jobs[index];
-                    final data = job.data() as Map<String, dynamic>;
-
-                    // get data from each post
-                    final title = data['title'] ?? 'No Title';
-                    final description = data['description'] ?? '';
-                    final location = data['location'] ?? '';
-                    final budget = data['budget'] ?? '';
-                    final contact = data['contact'] ?? '';
-
-                    // return as a list tile
-                    return MyListTile(
-                      title: title,
-                      location: location,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => JobDetailsPage(
-                              title: title,
-                              description: description,
-                              location: location,
-                              budget: budget,
-                              contact: contact,
-                            ),
-                          ),
-                        );
-                      }
-                    );
+                  onSubmitted: (value) {
+                    setState(() {
+                      _searchQuery = value.trim().toLowerCase();
+                    });
                   },
                 ),
-              );
-            },
+              ),
+
+              // search button
+              Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
+                  borderRadius: const BorderRadius.horizontal(
+                    right: Radius.circular(12)
+                  ),
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.search),
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                  onPressed: () {
+                    setState(() {
+                      _searchQuery = _searchController.text.trim().toLowerCase();
+                    });
+                  }, 
+                ),
+              ),
+            ],
+          ),
+
+          // Job list
+          Expanded(
+            child: StreamBuilder(
+              stream: database.getJobsStream(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final jobs = snapshot.data?.docs ?? [];
+
+                // apply search filter
+                final trimmedQuery = _searchQuery.trim();
+                final filteredJobs = trimmedQuery.isEmpty
+                    ? jobs
+                    : jobs.where((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      final title = data['title']?.toString().toLowerCase() ?? '';
+                      final location = data['location']?.toString().toLowerCase() ?? '';
+                      return title.contains(trimmedQuery) || location.contains(trimmedQuery);
+                    }).toList();                  
+
+                if (filteredJobs.isEmpty) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(25),
+                      child: Text("No jobs found matching your search."),
+                    ),
+                  );
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Count
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Text(
+                        "${filteredJobs.length} job${filteredJobs.length == 1 ? '' : 's'} listed",
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                    ),
+
+                    // Job list
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: filteredJobs.length,
+                        separatorBuilder: (context, index) => const SizedBox(height: 6),
+                        itemBuilder: (context, index) {
+                          final job = filteredJobs[index];
+                          final data = job.data() as Map<String, dynamic>;
+
+                          final title = data['title'] ?? 'No Title';
+                          final description = data['description'] ?? '';
+                          final location = data['location'] ?? '';
+                          final budget = data['budget'] ?? '';
+                          final contact = data['contact'] ?? '';
+
+                          return JobListCard(
+                            title: title,
+                            location: location,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => JobDetailsPage(
+                                    title: title,
+                                    description: description,
+                                    location: location,
+                                    budget: budget,
+                                    contact: contact,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),

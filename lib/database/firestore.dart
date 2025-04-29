@@ -33,26 +33,25 @@ class FirestoreDatabase {
     String location, 
     String budget,
     String contact,
-  ) {
-    return jobs.add({
+    List<String> tags,
+    String? jobType,
+  ) async {
+    await jobs.add({
       'title': title,
       'description': description,
       'location': location,
       'budget': budget,
-      'UserEmail': user?.email ?? '',
       'contact': contact,
-      'TimeStamp': Timestamp.now(),
+      'tags': tags,
+      'jobType': jobType,
+      'timestamp': Timestamp.now(),
+      'userId': user?.uid,
     });
   }
 
   // read jobs from firebase
   Stream<QuerySnapshot> getJobsStream() {
-    final postsStream = FirebaseFirestore.instance
-        .collection('Jobs')
-        .orderBy('TimeStamp', descending: true)
-        .snapshots();
-
-    return postsStream;
+    return jobs.orderBy('timestamp', descending: true).snapshots();
   }
 
   // register a gardener
@@ -69,17 +68,13 @@ class FirestoreDatabase {
       'email': email,
       'location': location,
       'services': services,
-      'TimeStamp': Timestamp.now(),
+      'timestamp': Timestamp.now(),
+      'userId': user?.uid,
     });
   }
 
   // read providers from firebase
   Stream<QuerySnapshot> getProvidersStream() {
-    final postsStream = FirebaseFirestore.instance
-        .collection('Providers')
-        .orderBy('name')
-        .snapshots();
-
-    return postsStream;
+    return providers.orderBy('name').snapshots();
   }
 }
