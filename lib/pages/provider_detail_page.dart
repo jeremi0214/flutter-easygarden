@@ -7,6 +7,7 @@ class ProviderDetailsPage extends StatelessWidget {
   final String email;
   final String location;
   final String services;
+  final List<String> categories;
 
   const ProviderDetailsPage({
     super.key,
@@ -15,6 +16,7 @@ class ProviderDetailsPage extends StatelessWidget {
     required this.email,
     required this.location,
     required this.services,
+    required this.categories,
   });
 
   void _launchPhone() async {
@@ -54,6 +56,25 @@ class ProviderDetailsPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Text(services, style: const TextStyle(fontSize: 16)),
               ),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              "Specialist Categories",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: categories.map((category) {
+                return Chip(
+                  label: Text(category),
+                  backgroundColor: Colors.teal.shade100,
+                  labelStyle: const TextStyle(color: Colors.black),
+                );
+              }).toList(),
             ),
 
             const SizedBox(height: 20),

@@ -27,6 +27,19 @@ class _RegisterGardenerPageState extends State<RegisterGardenerPage> {
   // firestore access
   final FirestoreDatabase database = FirestoreDatabase();
 
+  // Categories
+  final List<String> allCategories = [
+    "Lawn Care",
+    "Tree Pruning",
+    "Hedge Trimming",
+    "Weeding",
+    "Landscaping",
+    "Composting",
+    "Watering Systems",
+    "Garden Cleanup",
+  ];
+  final Set<String> selectedCategories = {};
+
   // valid email
   bool isValidEmail(String input) {
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$").hasMatch(input);
@@ -49,6 +62,7 @@ class _RegisterGardenerPageState extends State<RegisterGardenerPage> {
         emailController.text.trim(),
         locationController.text.trim(),
         servicesController.text.trim(),
+        selectedCategories.toList(),
       );
 
       // go back to provider list page
@@ -140,6 +154,40 @@ class _RegisterGardenerPageState extends State<RegisterGardenerPage> {
                   validator: (value) => value == null || value.isEmpty
                       ? "Description is required"
                       : null,
+                ),
+                const SizedBox(height: 25),
+
+                // Categories Header
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Specialist Categories",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Checkbox List
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: allCategories.length,
+                  itemBuilder: (context, index) {
+                    final category = allCategories[index];
+                    return CheckboxListTile(
+                      title: Text(category),
+                      value: selectedCategories.contains(category),
+                      onChanged: (bool? isChecked) {
+                        setState(() {
+                          if (isChecked == true) {
+                            selectedCategories.add(category);
+                          } else {
+                            selectedCategories.remove(category);
+                          }
+                        });
+                      },
+                    );
+                  },
                 ),
                 const SizedBox(height: 25),
 

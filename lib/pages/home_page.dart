@@ -154,6 +154,7 @@ class _HomePageState extends State<HomePage> {
                                     location: location,
                                     budget: budget,
                                     contact: contact,
+                                    categories: [],
                                   ),
                                 ),
                               );

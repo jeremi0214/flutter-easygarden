@@ -35,6 +35,7 @@ class FirestoreDatabase {
     String contact,
     List<String> tags,
     String? jobType,
+    List<String> categories,
   ) async {
     await jobs.add({
       'title': title,
@@ -44,6 +45,7 @@ class FirestoreDatabase {
       'contact': contact,
       'tags': tags,
       'jobType': jobType,
+      'categories': categories,
       'timestamp': Timestamp.now(),
       'userId': user?.uid,
     });
@@ -61,6 +63,7 @@ class FirestoreDatabase {
     String email, 
     String location,
     String services,
+    List<String> categories,
   ) {
     return providers.add({
       'name': name,
@@ -68,6 +71,7 @@ class FirestoreDatabase {
       'email': email,
       'location': location,
       'services': services,
+      'categories': categories,
       'timestamp': Timestamp.now(),
       'userId': user?.uid,
     });

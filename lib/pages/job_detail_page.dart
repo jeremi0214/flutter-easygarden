@@ -7,6 +7,7 @@ class JobDetailsPage extends StatelessWidget {
   final String location;
   final String budget;
   final String contact;
+  final List<String> categories;
 
   const JobDetailsPage({
     super.key,
@@ -15,6 +16,7 @@ class JobDetailsPage extends StatelessWidget {
     required this.location,
     required this.budget,
     required this.contact,
+    required this.categories,
   });
 
   void _launchContact() async {
@@ -49,6 +51,12 @@ class JobDetailsPage extends StatelessWidget {
               value: budget,
             ),
             const SizedBox(height: 20),
+            
+            _buildSection(
+              icon: Icons.category,
+              label: 'Categories',
+              value: categories.join(', '),
+            ),
             const Text(
               "Contact number:",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

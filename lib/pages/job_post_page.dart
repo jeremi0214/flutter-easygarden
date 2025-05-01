@@ -32,6 +32,17 @@ class _JobPostPageState extends State<JobPostPage> {
 
   List<String> selectedTags = [];
 
+  // Category options
+  final List<String> availableCategories = [
+    'Lawn Care',
+    'Cleaning',
+    'Tree Work',
+    'Landscaping',
+    'General Repair',
+  ];
+
+  String? selectedCategory;
+
   // Job type options
   final List<String> jobTypes = ['One-off', 'Routine job'];
   String? selectedJobType; // optional
@@ -58,6 +69,7 @@ class _JobPostPageState extends State<JobPostPage> {
         contactController.text.trim(),
         selectedTags,
         selectedJobType,
+        selectedCategory != null ? [selectedCategory!] : [],
       );
 
       // go back to home page
@@ -87,6 +99,28 @@ class _JobPostPageState extends State<JobPostPage> {
                 Expanded(
                   child: ListView(
                     children: [
+                      // select the category
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: "Select Category",
+                          border: OutlineInputBorder(),
+                        ),
+                        value: selectedCategory,
+                        isExpanded: true,
+                        items: availableCategories
+                            .map((category) => DropdownMenuItem(
+                                  value: category,
+                                  child: Text(category),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() => selectedCategory = value);
+                        },
+                        validator: (value) =>
+                            value == null ? "Please select a category" : null,
+                      ),
+                      const SizedBox(height: 5),
+
                       // fill in job title
                       MyTextfield(
                         hintText: "Job Title",
@@ -130,7 +164,7 @@ class _JobPostPageState extends State<JobPostPage> {
 
                       // fill in budget
                       MyTextfield(
-                        hintText: "Budget (e.g. \$50 - \$100)",
+                        hintText: "Budget (e.g. \$50 - \$100), or you can type in 'TBD'",
                         obscureText: false,
                         controller: budgetController,
                         keyboardType: TextInputType.number,
@@ -179,7 +213,8 @@ class _JobPostPageState extends State<JobPostPage> {
                           });
                         },
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
+                      Text("Select tags", style: TextStyle(fontWeight: FontWeight.bold)),
 
                       // Tags as wrap
                       Wrap(
@@ -191,7 +226,7 @@ class _JobPostPageState extends State<JobPostPage> {
                             selected: isSelected,
                             onSelected: (selected) {
                               setState(() {
-                                if (selected) {
+                                if (selected && !selectedTags.contains(tag)) {
                                   selectedTags.add(tag);
                                 } else {
                                   selectedTags.remove(tag);

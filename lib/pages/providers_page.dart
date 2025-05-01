@@ -83,6 +83,7 @@ class ServiceProviderPage extends StatelessWidget {
                               email: email,
                               location: location,
                               services: services,
+                              categories: [],
                             ),
                           ),
                         );
