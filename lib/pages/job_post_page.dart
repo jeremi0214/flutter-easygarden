@@ -164,7 +164,7 @@ class _JobPostPageState extends State<JobPostPage> {
 
                       // fill in budget
                       MyTextfield(
-                        hintText: "Budget (e.g. \$50 - \$100), or you can type in 'TBD'",
+                        hintText: "Budget (e.g. \$50 - \$100)",
                         obscureText: false,
                         controller: budgetController,
                         keyboardType: TextInputType.number,

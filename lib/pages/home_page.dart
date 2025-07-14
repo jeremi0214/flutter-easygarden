@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Search by title or location...',
+                    hintText: 'Search by title or location, or category...',
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.primary,
                     border: OutlineInputBorder(
@@ -102,7 +102,8 @@ class _HomePageState extends State<HomePage> {
                         final data = doc.data() as Map<String, dynamic>;
                         final title = data['title']?.toString().toLowerCase() ?? '';
                         final location = data['location']?.toString().toLowerCase() ?? '';
-                        return title.contains(trimmedQuery) || location.contains(trimmedQuery);
+                        final category = data['category']?.toString().toLowerCase() ?? '';
+                        return title.contains(trimmedQuery) || location.contains(trimmedQuery) || category.contains(trimmedQuery);
                       }).toList();
 
                 if (filteredJobs.isEmpty) {
@@ -140,6 +141,7 @@ class _HomePageState extends State<HomePage> {
                           final location = data['location'] ?? '';
                           final budget = data['budget'] ?? '';
                           final contact = data['contact'] ?? '';
+                          final List<String> categories = List<String>.from(data['categories'] ?? []);
 
                           return JobListCard(
                             title: title,
@@ -154,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                                     location: location,
                                     budget: budget,
                                     contact: contact,
-                                    categories: [],
+                                    categories: categories,
                                   ),
                                 ),
                               );

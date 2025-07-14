@@ -56,6 +56,22 @@ class FirestoreDatabase {
     return jobs.orderBy('timestamp', descending: true).snapshots();
   }
 
+  // Get jobs by a single selected category
+  Stream<QuerySnapshot> getJobsByCategory(String category) {
+    return jobs
+        .where('categories', arrayContains: category)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+
+  // Get jobs matching any of multiple categories (max 10)
+  Stream<QuerySnapshot> getJobsByMultipleCategories(List<String> selectedCategories) {
+    return jobs
+        .where('categories', arrayContainsAny: selectedCategories)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+
   // register a gardener
   Future<void> registerGardener(
     String name, 
